@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -28,6 +29,10 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject gameVictoryPanel;
     [SerializeField] private GameObject gameOverPanel;
+
+    [SerializeField] private AudioSource warriorSound;
+    [SerializeField] private AudioSource peasantSound;
+    [SerializeField] private AudioSource invasionSound;
     
     private int _foodCounter;
     private int _peasantCounter;
@@ -41,7 +46,7 @@ public class GameManager : MonoBehaviour
 
     private float _peasantCreateTime = 10f;
     private float _warriorCreateTime = 2.5f;
-    private float _invasionMaxTime = 25f;
+    private float _invasionMaxTime = 30f;
     
     private float _peasantTimer = -2f;
     private float _warriorTimer = -2f;
@@ -50,7 +55,7 @@ public class GameManager : MonoBehaviour
     private int _nextInvasionScale = 0;
     private int _nextInvasionIncrease = 1;
     private int _invasionCounter = 1;
-
+    
     public void CreatePeasantOnButtonClick()
     {
         if (_foodCounter >= _peasantCost)
@@ -101,6 +106,7 @@ public class GameManager : MonoBehaviour
             peasantButton.interactable = true;
             _peasantCounter++;
             _peasantTimer = -2f;
+            peasantSound.Play();
         }
     }
 
@@ -116,6 +122,7 @@ public class GameManager : MonoBehaviour
             warriorButton.interactable = true;
             _warriorCounter++;
             _warriorTimer = -2f;
+            warriorSound.Play();
         }
     }
 
@@ -129,6 +136,7 @@ public class GameManager : MonoBehaviour
             _invasionCounter++;
             _invasionTimer = _invasionMaxTime;
             _warriorCounter -= _nextInvasionScale;
+            invasionSound.Play();
 
             if (_invasionCounter > 2)
             {
@@ -140,7 +148,7 @@ public class GameManager : MonoBehaviour
 
     private void CheckGameState()
     {
-        if (_warriorCounter >= 10 && _peasantCounter >= 15 && _foodCounter >= 1500)
+        if (_warriorCounter >= 20 && _peasantCounter >= 15 && _foodCounter >= 2500)
         {
             Time.timeScale = 0;
             gameVictoryPanel.SetActive(true);
@@ -151,7 +159,8 @@ public class GameManager : MonoBehaviour
         {
             Time.timeScale = 0;
             gameOverPanel.SetActive(true);
-            gameOverText.text = $"Survived {_invasionCounter-1} waves";
+            gameOverText.text = $"Survived {_invasionCounter-1} waves" +
+                                $" \n Warriors:{_warriorCounter}\n Peasants: {_peasantCounter}\n Wheat: {_foodCounter}";
         };
     }
 
